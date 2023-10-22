@@ -9,7 +9,7 @@ Logo by zemonkamin
 ![image](https://github.com/user95401/ProfileImage/assets/90561697/02c3c67b-f774-48d7-ad95-7fe37cecdf97)
 
 
-## Install [for geode](blob/main/geode/release/user95401.ProfileImage.geode)
+## Install [for geode](/blob/main/geode/release/user95401.ProfileImage.geode)
 put .geode file to GeometryDash/geode/mods
-## Install [dll](blob/main/ProfileImage.dll)
+## Install [dll](/blob/main/ProfileImage.dll)
 just load it with any modloader
