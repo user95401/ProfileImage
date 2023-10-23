@@ -7,8 +7,8 @@ void ProfilePageExt::onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpRes
     std::vector<char>* responseData = response->getResponseData();
     std::string responseString(responseData->begin(), responseData->end());
     setBtn->stopAllActions();
-    setBtn->runAction(CCFadeIn::create(0.1));
-    if (responseString == "0" || responseString == "") {
+    setBtn->runAction(CCFadeIn::create(0.0));
+    if (responseString == "0") {
         if (GJAccountManager::sharedState()->m_nPlayerAccountID != m_nAccountID) setBtn->removeFromParent();
         return;
     }
@@ -44,7 +44,7 @@ bool __fastcall ProfilePage_init_H(ProfilePageExt* self, void*, int accID, bool 
     self->setBtn->setPositionY(-95.f);
     self->setBtn->CCMenuItemSpriteExtra::setScale(0.75f);
     self->setBtn->setContentSize({50.f, 50.f});
-    self->setBtn->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.1, 90), CCFadeTo::create(0.1, 160),nullptr)));
+    self->setBtn->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.3, 90), CCFadeTo::create(0.3, 160),nullptr)));
     self->getButtonMenu()->addChild(self->setBtn, 10, 68302);
     return ret;
 }

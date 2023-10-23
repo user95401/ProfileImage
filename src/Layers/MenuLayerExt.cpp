@@ -5,12 +5,11 @@ void MenuLayerExt::onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpRespo
     std::vector<char>* responseData = response->getResponseData();
     std::string responseString(responseData->begin(), responseData->end());
     m_profileBtn->stopAllActions();
-    m_profileBtn->runAction(CCFadeIn::create(0.1));
-    if (responseString == "0" || responseString == "") return;
+    m_profileBtn->runAction(CCFadeIn::create(0.0));
+    if (responseString == "0") return;
     // URLDownloadToFile returns S_OK on success
     if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), (std::filesystem::temp_directory_path() / ".ProfileBtnImage").string().c_str(), 0, NULL))
     {
-        CCTextureCache::sharedTextureCache()->reloadTexture(".ProfileBtnImage");
         CCSprite* Profile = ModUtils::createSprite(".ProfileBtnImage");
         if (Profile->getContentSize().width > Profile->getContentSize().height)
             Profile->setScale(m_profileBtn->getContentSize().width / Profile->getContentSize().width);
@@ -23,6 +22,7 @@ void MenuLayerExt::onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpRespo
         hiddenNode->runAction(CCRepeatForever::create(CCFadeOut::create(0.f)));
         m_profileBtn->setNormalImage(hiddenNode);
         m_profileBtn->setSelectedImage(hiddenNode);
+        CCTextureCache::sharedTextureCache()->reloadTexture(".ProfileBtnImage");
     }
     else
     {
@@ -32,9 +32,9 @@ void MenuLayerExt::onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpRespo
 
 inline bool (__thiscall* MenuLayer_init)(MenuLayerExt*);
 bool __fastcall MenuLayer_init_H(MenuLayerExt* self) {
-    if (!MenuLayer_init(self)) return false;
-    twoTimesLayerInitHookEscape(self);
+    MenuLayer_init(self);
     self->me = self;
+    twoTimesLayerInitHookEscape(self);//fucking works
 
     //profilebtn
     //Request
@@ -45,7 +45,7 @@ bool __fastcall MenuLayer_init_H(MenuLayerExt* self) {
     CCHttpClient::getInstance()->send(ProfileUpdateHttp);
     ProfileUpdateHttp->release();
 
-    self->m_profileBtn->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.1, 90), CCFadeTo::create(0.1, 160), nullptr)));
+    self->m_profileBtn->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.3, 90), CCFadeTo::create(0.3, 160), nullptr)));
 
     return true;
 }
