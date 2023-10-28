@@ -7,7 +7,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project ("ProfileImage")
 set(developer "user95401")
-set(version "v1.0.0")
+set(version "v1.1.0")
 set(description "ProfileImage, feat. [GTPS](https://discord.gg/mezwaFZ9Hk)")
 set(repository "https://github.com/user95401/gdModTemplate")
 set(issues_url "https://discord.gg/89VGJH6QQg")

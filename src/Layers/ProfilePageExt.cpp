@@ -13,7 +13,7 @@ void ProfilePageExt::onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpRes
         return;
     }
     // URLDownloadToFile returns S_OK on success
-    if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), (std::filesystem::temp_directory_path() / ".ProfileImage").string().c_str(), 0, NULL))
+    if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), "geode/temp/.ProfileImage", 0, NULL))
     {
         CCTextureCache::sharedTextureCache()->reloadTexture(".ProfileImage");
         CCSprite* Profile = ModUtils::createSprite(".ProfileImage");
@@ -40,8 +40,8 @@ bool __fastcall ProfilePage_init_H(ProfilePageExt* self, void*, int accID, bool 
     bool ret = ProfilePage_init(self, accID, idkB);
     twoTimesLayerInitHookEscape(self);
     self->setBtn = CCMenuItemSpriteExtra::create(ModUtils::createSprite("GJ_everyplayBtn_001.png"), self, menu_selector(ProfileImagePopup::createAndShowMe));
-    self->setBtn->setPositionX(15.f);
-    self->setBtn->setPositionY(-95.f);
+    self->setBtn->setPositionX(22.000f);
+    self->setBtn->setPositionY(-48.000f);
     self->setBtn->CCMenuItemSpriteExtra::setScale(0.75f);
     self->setBtn->setContentSize({50.f, 50.f});
     self->setBtn->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.3, 90), CCFadeTo::create(0.3, 160),nullptr)));

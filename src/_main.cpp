@@ -11,7 +11,7 @@ DWORD WINAPI PROCESS_ATTACH(void* hModule) {
     MH_SafeInitialize(); //CCMessageBox("just Initialized", __FUNCTION__);
     ProfilePageExt::CreateHooks();
     MenuLayerExt::CreateHooks();
-    CCFileUtils::sharedFileUtils()->addSearchPath(std::filesystem::temp_directory_path().string().c_str());
+    CCFileUtils::sharedFileUtils()->addSearchPath("geode/temp/");
     return 0;
 }
 

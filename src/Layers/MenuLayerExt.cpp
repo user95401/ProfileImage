@@ -8,7 +8,7 @@ void MenuLayerExt::onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpRespo
     m_profileBtn->runAction(CCFadeIn::create(0.0));
     if (responseString == "0") return;
     // URLDownloadToFile returns S_OK on success
-    if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), (std::filesystem::temp_directory_path() / ".ProfileBtnImage").string().c_str(), 0, NULL))
+    if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), "geode/temp/.ProfileBtnImage", 0, NULL))
     {
         CCSprite* Profile = ModUtils::createSprite(".ProfileBtnImage");
         if (Profile->getContentSize().width > Profile->getContentSize().height)
