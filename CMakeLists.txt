@@ -1,29 +1,22 @@
-﻿cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /MANIFEST:NO")
-cmake_policy(SET CMP0057 NEW)
+set(CMAKE_OSX_ARCHITECTURES "x86_64")
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project ("ProfileImage")
-set(developer "user95401")
-set(version "v1.1.0")
-set(description "ProfileImage, feat. [GTPS](https://discord.gg/mezwaFZ9Hk)")
-set(repository "https://github.com/user95401/gdModTemplate")
-set(issues_url "https://discord.gg/89VGJH6QQg")
-set(issues_info "U can write about it on <cb>user666's discord...</c>")
-set(LIBRARY_OUTPUT_PATH "${CMAKE_CURRENT_LIST_DIR}") # dll output
-set(GEODE_MOD_OUTPUT_PATH "D:\\Games\\user666\\Geometry.Dash.v07.24.2021\\geode\\mods") # geode mod output
+project(ProfileImage VERSION 1.0.0)
 
-#curly-eureka
-include("C:\\Users\\Lenovo\\source\\curly-eureka\\CURLY-EUREKA-INCL.cmake")
-
-#mod
-file(GLOB_RECURSE src
-src/* 
-src/Layers/*
+add_library(${PROJECT_NAME} SHARED
+    src/main.cpp
+    # Add your cpp files here
 )
-add_library(${PROJECT_NAME} SHARED ${src} ${curly_eureka_src})
 
-#geode-makeup
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/geode geode-build)
+if (NOT DEFINED ENV{GEODE_SDK})
+    message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
+else()
+    message(STATUS "Found Geode: $ENV{GEODE_SDK}")
+endif()
+
+add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+
+setup_geode_mod(${PROJECT_NAME})
