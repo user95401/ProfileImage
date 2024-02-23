@@ -108,7 +108,7 @@ public:
     };
     void onBtn1(CCObject*) {
         int id = GJAccountManager::sharedState()->m_accountID;
-        std::string name = GJAccountManager::sharedState()->m_username;
+        std::string name = GameManager::sharedState()->m_playerName;
         auto url = SetupPageUrl(id, name);
         CCApplication::sharedApplication()->openURL(url.c_str());
         this->keyBackClicked();
