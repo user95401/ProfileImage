@@ -107,3 +107,54 @@ if(isset($_GET["id"]) and isset($_GET["name"])) {
 }
 
 ?>
+
+<style>
+.user_block {
+    text-align: center;
+    padding: 1.1rem;
+    backdrop-filter: brightness(0.5);
+    margin: .5rem;
+}
+.user_block_img {
+    max-height: 180px;
+    min-height: 180px;
+}
+.user_block_name {
+    margin-bottom: 0;
+}
+.user_block_id {
+    margin-top: 0;
+    filter: opacity(0.3);
+}
+</style>
+<details>
+<summary style="font-size: xx-large;">Thanks for using!</summary>
+<div style="
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+">
+<?php 
+$ffs = scandir("users"); 
+foreach($ffs as $ff) {
+    //if uppers things
+    if($ff == ".." or $ff == ".") $ff = "";
+    //user and id
+    $userEntry = explode(".", $ff);
+    //img
+    include "users/".$ff;
+    $userBlock = ("
+        <div class=\"user_block\">
+            <img class=\"user_block_img\" src=\"$url\" loading=\"lazy\">
+            <h1 class=\"user_block_name\">${userEntry[1]}</h1>
+            <h3 class=\"user_block_id\">${userEntry[0]}</h3>
+        </div class=\"user_block\">
+    ");
+    echo $ff !== "" ?
+    $userBlock
+    : "";
+}
+?>
+</div>
+</details>
