@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 using namespace geode::prelude;
 
-void changeBtnImage(CCMenuItemSpriteExtra* asd, std::string name) {
+void ChangeBtnImage(CCMenuItemSpriteExtra* asd, std::string name) {
     CCTextureCache::sharedTextureCache()->reloadTexture(name.c_str());
     auto news = CCSprite::create(name.c_str());
     if (!news or !asd) return;
@@ -13,7 +13,16 @@ void changeBtnImage(CCMenuItemSpriteExtra* asd, std::string name) {
     asd->setContentSize(news->getScaledContentSize());
 }
 
-std::string imgGetUrl(int id, std::string name) {
+#include <urlmon.h>
+#pragma comment (lib, "urlmon.lib")
+#include <regex>
+std::string TempFileFromURL(std::string url, std::string filename) {
+    auto file_path = Mod::get()->getTempDir() / filename;
+    bool dwnlrtn = S_OK == URLDownloadToFile(NULL, url.data(), file_path.string().data(), 0, NULL);
+    return (dwnlrtn ? file_path.string() : "");
+}
+
+std::string ImgGetUrl(int id, std::string name) {
     std::stringstream ret;
     ret << "http://profileimage.user95401.undo.it/?linker&";//get open
     ret << "id=" << id;//id
@@ -22,7 +31,7 @@ std::string imgGetUrl(int id, std::string name) {
     return ret.str();
 }
 
-std::string setupPageUrl(int id, std::string name) {
+std::string SetupPageUrl(int id, std::string name) {
     std::stringstream ret;
     ret << "http://profileimage.user95401.undo.it/?";//get open
     ret << "id=" << id;//id
@@ -100,7 +109,7 @@ public:
     void onBtn1(CCObject*) {
         int id = GJAccountManager::sharedState()->m_accountID;
         std::string name = GJAccountManager::sharedState()->m_username;
-        auto url = setupPageUrl(id, name);
+        auto url = SetupPageUrl(id, name);
         CCApplication::sharedApplication()->openURL(url.c_str());
         this->keyBackClicked();
     };
@@ -109,12 +118,6 @@ public:
     };
 };
 
-$on_mod(Loaded) {
-	CCFileUtils::sharedFileUtils()->addSearchPath("geode/temp/");
-}
-
-#include <urlmon.h>
-#pragma comment (lib, "urlmon.lib")
 #include <Geode/modify/MenuLayer.hpp>
 class $modify(MenuLayerExt, MenuLayer) {
 	CCMenuItemSpriteExtra* profileBtn() {
@@ -122,15 +125,19 @@ class $modify(MenuLayerExt, MenuLayer) {
 		return static_cast<CCMenuItemSpriteExtra*>(profilebutton ? profilebutton : CCNode::create());
 	}
     void onProfileUpdateHttpResponse(CCHttpClient* client, CCHttpResponse* response) {
+        //responseString
         std::vector<char>* responseData = response->getResponseData();
         std::string responseString(responseData->begin(), responseData->end());
+        //filenema
         std::string filenema = response->getHttpRequest()->getTag();
+        //stop animating profileBtn
         profileBtn()->stopAllActions();
         profileBtn()->setOpacity(255);
-        if (responseString == "0") return;
-        // URLDownloadToFile returns S_OK on success
-        if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), std::format("geode/temp/{}", filenema).c_str(), 0, NULL)) {
-            changeBtnImage(profileBtn(), filenema);
+        //bad response
+        if (responseString == "0" or responseString == "" or response->getResponseCode() != 200) return;
+        auto dwnloadedFile = TempFileFromURL(responseString, filenema);
+        if (dwnloadedFile != "") {
+            ChangeBtnImage(profileBtn(), dwnloadedFile);
             profileBtn()->m_colorEnabled = true;
             profileBtn()->m_animationEnabled = false;
         }
@@ -144,9 +151,9 @@ class $modify(MenuLayerExt, MenuLayer) {
         ProfileUpdateHttp->setRequestType(CCHttpRequest::HttpRequestType::kHttpPost);
         int id = GJAccountManager::sharedState()->m_accountID;
         std::string name = GJAccountManager::sharedState()->m_username;
-        auto url = imgGetUrl(id, name);
+        auto url = ImgGetUrl(id, name);
         ProfileUpdateHttp->setUrl(url.c_str());
-        ProfileUpdateHttp->setTag(std::format("{}.{}.png", id, name).c_str());
+        ProfileUpdateHttp->setTag(std::format("{}.{}.ProfileImage", id, name).c_str());
         ProfileUpdateHttp->setResponseCallback(this, httpresponse_selector(MenuLayerExt::onProfileUpdateHttpResponse));
         CCHttpClient::getInstance()->send(ProfileUpdateHttp);
         ProfileUpdateHttp->release();
@@ -154,10 +161,11 @@ class $modify(MenuLayerExt, MenuLayer) {
         profileBtn()->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.3f, 90), CCFadeTo::create(0.3f, 160), nullptr)));
         //try set already dwnloadded a img
         std::string filenema = ProfileUpdateHttp->getTag(); 
-        changeBtnImage(profileBtn(), filenema);
+        ChangeBtnImage(profileBtn(), filenema);
     };
 	bool init() {
 		if (!MenuLayer::init()) return false;
+        if (Mod::get()->getSettingValue<bool>("DnttchMenuLayer")) return true;
 		//Request
         ProfileUpdateHttpReq(0.f);
         return true;
@@ -171,19 +179,23 @@ class $modify(ProfilePageExt, ProfilePage) {
         return static_cast<CCMenuItemSpriteExtra*>(profilebutton ? profilebutton : CCNode::create());
     }
     void onProfileUpdateHttpResponse(CCHttpClient * client, CCHttpResponse * response) {
+        //responseString
         std::vector<char>* responseData = response->getResponseData();
         std::string responseString(responseData->begin(), responseData->end());
+        //filenema
         std::string filenema = response->getHttpRequest()->getTag();
+        //stop animating profileBtn
         profileBtn()->stopAllActions();
         profileBtn()->setOpacity(255);
-        if (responseString == "0") return;
-        // URLDownloadToFile returns S_OK on success
-        if (S_OK == URLDownloadToFile(NULL, responseString.c_str(), std::format("geode/temp/{}", filenema).c_str(), 0, NULL)) {
-            changeBtnImage(profileBtn(), filenema);
+        //bad response
+        if (responseString == "0" or responseString == "" or response->getResponseCode() != 200) return;
+        auto dwnloadedFile = TempFileFromURL(responseString, filenema);
+        if (dwnloadedFile != "") {
+            ChangeBtnImage(profileBtn(), dwnloadedFile);
         }
         else {
             Notification::create("Failed download Profile Image.", NotificationIcon::Error, 0.5f)->show();
-            //AchievementNotifier::sha()->notifyAchievement("Profile Image", "\n", "deleteFilter_none_001.png", true);
+            //AchievementNotifier::sha()->notifyAchievement("Profile Image", "Failed download Profile Image.\n", "deleteFilter_none_001.png", true);
         }
     }
     void ProfileUpdateHttpReq(float) {
@@ -191,9 +203,9 @@ class $modify(ProfilePageExt, ProfilePage) {
         ProfileUpdateHttp->setRequestType(CCHttpRequest::HttpRequestType::kHttpPost);
         int id = m_score->m_accountID;
         std::string name = m_score->m_userName;
-        auto url = imgGetUrl(id, name);
+        auto url = ImgGetUrl(id, name);
         ProfileUpdateHttp->setUrl(url.c_str());
-        ProfileUpdateHttp->setTag(std::format("{}.{}.png", id, name).c_str());
+        ProfileUpdateHttp->setTag(std::format("{}.{}.ProfileImage", id, name).c_str());
         ProfileUpdateHttp->setResponseCallback(this, httpresponse_selector(ProfilePageExt::onProfileUpdateHttpResponse));
         CCHttpClient::getInstance()->send(ProfileUpdateHttp);
         ProfileUpdateHttp->release();
@@ -201,10 +213,11 @@ class $modify(ProfilePageExt, ProfilePage) {
         profileBtn()->runAction(CCRepeatForever::create(CCSequence::create(CCFadeTo::create(0.3f, 90), CCFadeTo::create(0.3f, 160), nullptr)));
         //try set already dwnloadded a img
         std::string filenema = ProfileUpdateHttp->getTag();
-        changeBtnImage(profileBtn(), filenema);
+        ChangeBtnImage(profileBtn(), filenema);
     };
     bool init(int accountID, bool ownProfile) {
         if (!ProfilePage::init(accountID, ownProfile)) return false;
+        if (Mod::get()->getSettingValue<bool>("DnttchProfilePage")) return true;
         /// p o i n
         CCMenuItemSpriteExtra* setBtn = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("bgIcon_10_001.png"), this, /*nullptr);*/menu_selector(ProfileImagePopup::createAndShowMe));
         setBtn->setID("profile-image");
@@ -220,11 +233,12 @@ class $modify(ProfilePageExt, ProfilePage) {
         auto socialsmenu = this->getChildByIDRecursive("socials-menu");
         if(socialsmenu) socialsmenu->setPositionX(socialsmenu->getPositionX() + 40);
         //lol
-        if(ownProfile) m_mainLayer->setAnchorPoint({ 0.1f, 0.3f });//huh
+        if(ownProfile and not Mod::get()->getSettingValue<bool>("DAOPFC")) m_mainLayer->setAnchorPoint({ 0.1f, 0.3f });//huh
         return true;
     }
     void loadPageFromUserInfo(GJUserScore* p0) {
         ProfilePage::loadPageFromUserInfo(p0);
+        if (Mod::get()->getSettingValue<bool>("DnttchProfilePage")) return;
         //Request
         ProfileUpdateHttpReq(0.f);
         auto statsmenu = this->getChildByIDRecursive("stats-menu");
