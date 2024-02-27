@@ -29,7 +29,16 @@ margin: 0.6rem 0.0rem;
 padding: 0.3rem;
 width: 100%;
 zoom: 1.2;
-} 
+}
+a {
+    -webkit-text-stroke-width: thin;
+    color:white;
+    text-underline-offset: 5px;
+}
+a:hover {
+    -webkit-text-stroke-width: unset;
+    color:lightgray;
+}
 </style>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,7 +49,7 @@ function html_putPassword($msg){
     return ("
     <h1>Hello! ${_GET['name']}?</h1>
     Create a password to take over this user register point (${_GET['id']}.${_GET['name']}) for your own use.
-    <br>Or just login if already registered.
+    <br>Or just login if already registered. <a target=\"_blank\" href=\"https://github.com/user95401/ProfileImage/issues\">Help...</a>
     <br>$msg
     <form method=\"post\">
     <input value=\"${_POST['Password']}\" placeholder=\"Password\" type=\"Password\" name=\"Password\" required>
@@ -51,7 +60,7 @@ function html_saveImgLink($msg){
     return ("
     <h1>Hello, ${_GET['name']}! again.. huh</h1>
     (${_GET['id']}.${_GET['name']})
-    <br>Now u can set link up to ur image:
+    <br>Now u can set link up to ur image: <span style=\"opacity: 0.5;\">its better if u put .png or .jpg, NOT .gif .webp .ico .bpm and stuff</span>
     <br>$msg
     <form method=\"post\">
         <input value=\"${_POST['Password']}\" type=\"hidden\" name=\"Password\">
@@ -118,6 +127,7 @@ if(isset($_GET["id"]) and isset($_GET["name"])) {
 .user_block_img {
     max-height: 180px;
     min-height: 180px;
+    max-width: 100%;
 }
 .user_block_name {
     margin-bottom: 0;
@@ -128,7 +138,7 @@ if(isset($_GET["id"]) and isset($_GET["name"])) {
 }
 </style>
 <details>
-<summary style="font-size: xx-large;">Thanks for using!</summary>
+<summary style="font-size: xx-large;">Thanks for use!</summary>
 <div style="
     display: flex;
     flex-wrap: wrap;
