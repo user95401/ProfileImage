@@ -1,6 +1,6 @@
 <?php
 //preload page stuff
-
+error_reporting(E_ALL);
 mkdir('users', 0700, true);//make users dir (700 its owner only prems)
 
 if(isset($_GET["id"]) and isset($_GET["name"]) and isset($_GET["linker"])) {
@@ -60,7 +60,7 @@ function html_saveImgLink($msg){
     return ("
     <h1>Hello, ${_GET['name']}! again.. huh</h1>
     (${_GET['id']}.${_GET['name']})
-    <br>Now u can set link up to ur image: <span style=\"opacity: 0.5;\">its better if u put .png or .jpg, NOT .gif .webp .ico .bpm and stuff</span>
+    <br>Now u can set link up to ur image: <span style=\"opacity: 0.5;\">its better if u put .png or .jpg, NOT .gif/.webp/.ico/.bpm/data and stuff</span>
     <br>$msg
     <form method=\"post\">
         <input value=\"${_POST['Password']}\" type=\"hidden\" name=\"Password\">
@@ -89,6 +89,17 @@ return
 if(isset($_GET["id"]) and isset($_GET["name"])) {
     //no pass = put it pls
     if(!isset($_POST["Password"])) exit(html_putPassword(""));
+    //tests
+    if($_GET["id"] == 0) exit(html_putPassword("<b style=\"color: coral;\">Bad Account ID!</b>"));
+    if($_GET["name"] == "") exit(html_putPassword("<b style=\"color: coral;\">Bad Account ID!</b>"));
+    $urlFromPost = $_POST["url"];
+    $urlisbadlol = $urlFromPost." <<< BAD URL :D";
+    $_POST["url"] = $urlisbadlol;
+    if(!filter_var($urlFromPost, FILTER_VALIDATE_URL)) exit(html_saveImgLink("<b style=\"color: coral;\">ISNT VALID URL</b>"));
+    if(strlen($urlFromPost) > 200) exit(html_saveImgLink("<b style=\"color: coral;\">LONG URL (>200)</b>"));
+    if(strpos($urlFromPost, ".webp") !== false) exit(html_saveImgLink("<b style=\"color: coral;\">game dont support .webp</b>"));
+    if(strpos($urlFromPost, ".gif") !== false) exit(html_saveImgLink("<b style=\"color: coral;\">game dont support .gif 🧐</b>"));
+    $_POST["url"] = $urlFromPost;
     //userEntry
     $file = "./users/" . $_GET["id"] . "." . $_GET["name"]. ".php";//   ./users/228.name.php
     $usr_pass_valid = false;
@@ -99,6 +110,8 @@ if(isset($_GET["id"]) and isset($_GET["name"])) {
         echo" - ".($usr_pass_valid ? "IS VALID" : "INVALID");
     }
     else {//!file_exists save pass
+        //LONG PASSWORD (>100)
+        if(strlen($str) > 100) exit(html_putPassword("<b style=\"color: coral;\">LONG PASSWORD (>100)</b>"));
         echo"Password saved.";
         file_put_contents($file, userEntryContent($_POST["Password"], "0"));
         $usr_pass_valid = true;
