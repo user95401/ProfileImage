@@ -1,14 +1,15 @@
 <?php
 //preload page stuff
 error_reporting(E_ALL);
-mkdir('users', 0700, true);//make users dir (700 its owner only prems)
-
+//makin users dir
+if (!file_exists('users')) 
+    mkdir('users', 0700, true);//make users dir (700 its owner only prems)
+//rtn the link
 if(isset($_GET["id"]) and isset($_GET["name"]) and isset($_GET["linker"])) {
     $file = "./users/" . $_GET["id"] . "." . $_GET["name"]. ".php";//   ./users/228.name.php
     include $file;//$url var in it
     exit(filter_var($url, FILTER_VALIDATE_URL) ? $url : "0");
 }
-
 ?>
 
 <style>
@@ -46,37 +47,47 @@ a:hover {
 <?php
 
 function html_putPassword($msg){
+    $name = $_GET['name'];
+    $id = $_GET['id'];
+    $password = $_POST['Password'] ?? "";
+
     return ("
-    <h1>Hello! ${_GET['name']}?</h1>
-    Create a password to take over this user register point (${_GET['id']}.${_GET['name']}) for your own use.
+    <h1>Hello! $name?</h1>
+    Create a password to take over this user register point ($id.$name) for your own use.
     <br>Or just login if already registered. <a target=\"_blank\" href=\"https://github.com/user95401/ProfileImage/issues\">Help...</a>
     <br>$msg
     <form method=\"post\">
-    <input value=\"${_POST['Password']}\" placeholder=\"Password\" type=\"Password\" name=\"Password\" required>
+    <input value=\"$password\" placeholder=\"Password\" type=\"Password\" name=\"Password\" required>
     <input type=\"submit\">
     ");
 }
 function html_saveImgLink($msg){
+    $name = $_GET['name'];
+    $id = $_GET['id'];
+    $url = $_POST['url'];
+    $password = $_POST['Password'];
+
     return ("
-    <h1>Hello, ${_GET['name']}! again.. huh</h1>
-    (${_GET['id']}.${_GET['name']})
+    <h1>Hello, $name! again.. huh</h1>
+    ($id.$name)
     <br>Now u can set link up to ur image: <span style=\"opacity: 0.5;\">its better if u put .png or .jpg, NOT .gif/.webp/.ico/.bpm/data and stuff</span>
     <br>$msg
     <form method=\"post\">
-        <input value=\"${_POST['Password']}\" type=\"hidden\" name=\"Password\">
-        <input value=\"${_POST['url']}\" placeholder=\"Image url\" type=\"url\" name=\"url\" id=\"imgInp\" required>
+        <input value=\"$password\" type=\"hidden\" name=\"Password\">
+        <input value=\"$url\" placeholder=\"Image url\" type=\"url\" name=\"url\" id=\"imgInp\" required>
         <div style=\"
     display: flex;
     align-items: flex-start;
     flex-direction: row;
     justify-content: space-between;
             \">
-            <img name=\"url\" id=\"blah\" src=\"${_POST['url']}\" alt=\"Link is bad seems\" style=\"max-height: 22vh;\"/>
+            <img name=\"url\" id=\"blah\" src=\"$url\" alt=\"Link is bad seems\" style=\"max-height: 22vh;\"/>
             <input type=\"submit\" style=\"width: 10rem;margin: 0px;\">
         </div>
         <script>imgInp.onchange = evt => {blah.src = imgInp.value}</script>
     ");
 }
+
 function userEntryContent($pass, $url){//php file gen
 return
 ("
@@ -111,8 +122,8 @@ if(isset($_GET["id"]) and isset($_GET["name"])) {
     }
     else {//!file_exists save pass
         //LONG PASSWORD (>100)
-        if(strlen($str) > 100) exit(html_putPassword("<b style=\"color: coral;\">LONG PASSWORD (>100)</b>"));
-        echo"Password saved.";
+        if(strlen($_POST["Password"]) > 100) exit(html_putPassword("<b style=\"color: coral;\">LONG PASSWORD (>100)</b>")); 
+        echo "Password saved.";
         file_put_contents($file, userEntryContent($_POST["Password"], "0"));
         $usr_pass_valid = true;
     }
@@ -162,16 +173,19 @@ if(isset($_GET["id"]) and isset($_GET["name"])) {
 $ffs = scandir("users"); 
 foreach($ffs as $ff) {
     //if uppers things
-    if($ff == ".." or $ff == ".") $ff = "";
+    if($ff == ".." or $ff == ".") continue;
     //user and id
     $userEntry = explode(".", $ff);
+    $userName = $userEntry[1];
+    $userId = $userEntry[0];
+
     //img
     include "users/".$ff;
     $userBlock = ("
         <div class=\"user_block\">
             <img class=\"user_block_img\" src=\"$url\" loading=\"lazy\">
-            <h1 class=\"user_block_name\">${userEntry[1]}</h1>
-            <h3 class=\"user_block_id\">${userEntry[0]}</h3>
+            <h1 class=\"user_block_name\">$userName</h1>
+            <h3 class=\"user_block_id\">$userId</h3>
         </div class=\"user_block\">
     ");
     echo $ff !== "" ?
