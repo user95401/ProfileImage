@@ -24,7 +24,7 @@ std::string TempFileFromURL(std::string url, std::string filename) {
 
 std::string ImgGetUrl(int id, std::string name) {
     std::stringstream ret;
-    ret << "http://profileimage.user95401.undo.it/?linker&";//get open
+    ret << "https://zendomusic.ru/archive/profileimage/?linker&";//get open
     ret << "id=" << id;//id
     ret << "&";//and
     ret << "name=" << name;//name
@@ -33,7 +33,7 @@ std::string ImgGetUrl(int id, std::string name) {
 
 std::string SetupPageUrl(int id, std::string name) {
     std::stringstream ret;
-    ret << "http://profileimage.user95401.undo.it/?";//get open
+    ret << "https://zendomusic.ru/archive/profileimage/?";//get open
     ret << "id=" << id;//id
     ret << "&";//and
     ret << "name=" << name;//name
